@@ -21,6 +21,10 @@ setup(
     entry_points={
         'console_scripts': [
             'bb_gt_to_hdf5 = bb_data_utils.gt_to_hdf5:run',
+            'shuffle_hdf5 = bb_data_utils.shuffle_hdf5:main',
         ]
-    }
+    },
+    scripts=[
+        'scripts/shuffle_all_hdf5.sh'
+    ]
 )
