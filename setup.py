@@ -25,6 +25,7 @@ setup(
         ]
     },
     scripts=[
-        'scripts/shuffle_all_hdf5.sh'
+        'scripts/shuffle_all_hdf5.sh',
+        'scripts/build_gt.sh',
     ]
 )

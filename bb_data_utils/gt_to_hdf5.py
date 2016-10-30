@@ -8,7 +8,8 @@ from pipeline.stages.visualization import ResultCrownVisualizer
 from pipeline.stages.processing import Localizer
 from diktya.numpy import tile, image_save
 
-from deepdecoder.data import HDF5Dataset
+from diktya.distributions import DistributionCollection, Bernoulli
+from deepdecoder.data import DistributionHDF5Dataset
 import click
 import os
 from scipy.misc import imread
@@ -83,7 +84,10 @@ class FrameGeneratorFactory():
 def append_gt_to_hdf5(gt_period, dset):
     for gt_frame in gt_period.frames:
         h5_frame = {k: v for k, v in gt_frame.items() if type(v) == np.ndarray}
-        dset.append(**h5_frame)
+        dist = dset.get_tag_distribution()
+        labels = np.zeros((len(h5_frame['bits']),), dtype=dist.norm_dtype)
+        labels['bits'] = h5_frame.pop('bits')
+        dset.append(labels=labels, **h5_frame)
 
 
 @click.command("bb_gt_to_hdf5")
@@ -109,7 +113,9 @@ def run(gt_file, videos, images, visualize_debug, output, fix_utc_2014):
                                         get_filenames(images))
     if os.path.exists(output):
         os.remove(output)
-    dset = HDF5Dataset(output)
+
+    distribution = DistributionCollection([('bits', Bernoulli(), 12)])
+    dset = DistributionHDF5Dataset(output, distribution)
     camIdxs = []
     periods = []
     for fname in gt_file:
@@ -125,8 +131,8 @@ def run(gt_file, videos, images, visualize_debug, output, fix_utc_2014):
             rois, mask, positions = extract_gt_rois(np_frame, video_frame, start_dt)
             for name in np_frame.dtype.names:
                 gt[name] = np_frame[name][mask]
-            gt["bits"] = np.array([int_id_to_binary(id)[::-1] for id in gt["decodedId"]])
-            gt["tags"] = rois
+            gt["bits"] = 2 * np.array([int_id_to_binary(id)[::-1] for id in gt["decodedId"]]) -  1
+            gt["tags"] = 2 * rois - 1
             gt['filename'] = os.path.basename(video_filename)
             gt['camIdx'] = camIdx
             gt_frames.append(gt)
@@ -164,5 +170,5 @@ def visualize_detection_tiles(dset, name, n=20**2):
 
     tiled_raw = tile([img.swapaxes(0, -1) for img in imgs_raw])
     tiled_overlayed = tile([img.swapaxes(0, -1) for img in imgs_overlayed])
-    image_save(name + '_raw.png', tiled_raw, low=0, high=1)
-    image_save(name + '_overlayed.png', tiled_overlayed, low=0, high=1)
+    image_save(name + '_raw.png', tiled_raw)
+    image_save(name + '_overlayed.png', tiled_overlayed)
