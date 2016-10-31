@@ -7,7 +7,7 @@ IMAGE_FILE="/mnt/storage/beesbook/truth/image_directories.txt"
 
 print_help () {
     echo "$0 DIRECORY"
-    echo "creates a train/validation/test split of the groud truth data."
+    echo "creates a train/test split of the groud truth data."
     echo "Output is saved to DIRECORY"
 }
 if [ -z ${1+x} ]; then
@@ -48,11 +48,10 @@ for gt in "${GTs[@]}"; do
     without_ext=${filename%.bbb}
     echo_and_run $CMD -g $gt  $DATA_DIR/$without_ext.hdf5
 done
-# train / test / validation split
-echo_and_run $CMD -g ${GT_14_0} -g ${GT_15_0}  $DATA_DIR/gt_train.hdf5
-echo_and_run $CMD -g ${GT_15_1}  $DATA_DIR/gt_validation.hdf5
+
+# train / test
+echo_and_run $CMD -g ${GT_14_0} -g ${GT_15_0} -g ${GT_15_1} $DATA_DIR/gt_train.hdf5
 echo_and_run $CMD -g ${GT_14_1} -g ${GT_15_2} $DATA_DIR/gt_test.hdf5
 
 shuffle_hdf5 -o $DATA_DIR/gt_train_shuffled.hdf5 $DATA_DIR/gt_train.hdf5
-shuffle_hdf5 -o $DATA_DIR/gt_validation_shuffled.hdf5 $DATA_DIR/gt_validation.hdf5
 shuffle_hdf5 -o $DATA_DIR/gt_test_shuffled.hdf5 $DATA_DIR/gt_test.hdf5

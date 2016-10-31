@@ -98,7 +98,7 @@ def append_gt_to_hdf5(gt_period, dset):
 @click.option('--visualize-debug', is_flag=True)
 @click.option('--fix-utc-2014', type=bool, default=True)
 @click.argument('output')
-def run(gt_file, videos, images, visualize_debug, output, fix_utc_2014):
+def run(gt_file, videos, images, visualize_debug, output, fix_utc_2014, nb_bits=12):
     """
     Converts bb_binary ground truth Cap'n Proto files to hdf5 files and
     extracts the corresponding rois from videos or images.
@@ -114,7 +114,7 @@ def run(gt_file, videos, images, visualize_debug, output, fix_utc_2014):
     if os.path.exists(output):
         os.remove(output)
 
-    distribution = DistributionCollection([('bits', Bernoulli(), 12)])
+    distribution = DistributionCollection([('bits', Bernoulli(), nb_bits)])
     dset = DistributionHDF5Dataset(output, distribution)
     camIdxs = []
     periods = []
@@ -131,13 +131,13 @@ def run(gt_file, videos, images, visualize_debug, output, fix_utc_2014):
             rois, mask, positions = extract_gt_rois(np_frame, video_frame, start_dt)
             for name in np_frame.dtype.names:
                 gt[name] = np_frame[name][mask]
-            gt["bits"] = 2 * np.array([int_id_to_binary(id)[::-1] for id in gt["decodedId"]]) -  1
-            gt["tags"] = 2 * rois - 1
+            bits = [int_id_to_binary(id)[::-1] for id in gt["decodedId"]]
+            gt["bits"] = 2*np.array(bits, dtype=np.float) - 1
+            gt["tags"] = 2 * (rois / 255.).astype(np.float16) - 1
             gt['filename'] = os.path.basename(video_filename)
             gt['camIdx'] = camIdx
             gt_frames.append(gt)
             print('.', end='', flush=True)
-
         print()
         gt_period = GTPeriod(camIdx, start_dt, end_dt, fname, gt_frames)
 
@@ -162,11 +162,12 @@ def visualize_detection_tiles(dset, name, n=20**2):
     for i in range(n):
         p = indicies[i]
         position = np.array([dset['tags'][0, 0].shape]) / 2
-        tag = dset['tags'][p, 0] / 255
-        overlay = crown_vis(tag, position, np.zeros((1, 3)), dset['bits'][p:p+1])[0]
-        overlayed = crown_vis.add_overlay(tag, overlay)
+        tag = dset['tags'][p, 0]
+        bits = (dset['bits'][p:p+1] + 1) / 2.
+        overlay = crown_vis(tag, position, np.zeros((1, 3)), bits)[0]
+        overlayed = crown_vis.add_overlay((tag+1)/2, overlay)
         imgs_raw.append(tag)
-        imgs_overlayed.append(overlayed)
+        imgs_overlayed.append(2*overlayed - 1)
 
     tiled_raw = tile([img.swapaxes(0, -1) for img in imgs_raw])
     tiled_overlayed = tile([img.swapaxes(0, -1) for img in imgs_overlayed])
