@@ -11,7 +11,7 @@ dep_links = [str(req_line.url) for req_line in install_reqs]
 setup(
     name='bb_utils',
     version='0.1',
-    description='BeesBook Data Utils',
+    description='Beesbook utils',
     author='Leon Sixt',
     author_email='mail@leon-sixt.de',
     url='https://github.com/BioroboticsLab/bb_utils/',
