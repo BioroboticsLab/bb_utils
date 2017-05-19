@@ -20,7 +20,7 @@ class TagArtist:
         self.guideline_width = guideline_width
 
     def draw(self, bits_12):
-        bits = 1 - np.roll(bits_12, -3)
+        bits = np.roll(bits_12, -3)
 
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                      self.surface_width,
