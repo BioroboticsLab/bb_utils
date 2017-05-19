@@ -1,3 +1,3 @@
-# bb_data_utils
+# bb_utils
 
-This repository holds data conversion utilities.
+This repository holds beesbook utilities.

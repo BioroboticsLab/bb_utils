@@ -9,19 +9,19 @@ dep_links = [str(req_line.url) for req_line in install_reqs]
 
 
 setup(
-    name='bb_data_utils',
+    name='bb_utils',
     version='0.1',
     description='BeesBook Data Utils',
     author='Leon Sixt',
     author_email='mail@leon-sixt.de',
-    url='https://github.com/BioroboticsLab/bb_data_utils/',
+    url='https://github.com/BioroboticsLab/bb_utils/',
     install_requires=reqs,
     dependency_links=dep_links,
-    packages=['bb_data_utils'],
+    packages=['bb_utils'],
     entry_points={
         'console_scripts': [
-            'bb_gt_to_hdf5 = bb_data_utils.gt_to_hdf5:run',
-            'shuffle_hdf5 = bb_data_utils.shuffle_hdf5:main',
+            'bb_gt_to_hdf5 = bb_utils.scripts.gt_to_hdf5:run',
+            'shuffle_hdf5 = bb_utils.scripts.shuffle_hdf5:main',
         ]
     },
     scripts=[
