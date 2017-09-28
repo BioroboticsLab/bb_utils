@@ -15,14 +15,15 @@ setup(
     name='bb_utils',
     version='0.1',
     description='Beesbook utils',
-    author='Leon Sixt',
-    author_email='mail@leon-sixt.de',
+    author='Benjamin Wild',
+    author_email='b.w@fu-berlin.de',
     url='https://github.com/BioroboticsLab/bb_utils/',
     install_requires=reqs,
     dependency_links=dep_links,
     packages=['bb_utils'],
     package_dir={'bb_utils': 'bb_utils/'},
-    package_data={'bb_utils': ['data/hatchdates2016.csv']},
+    package_data={'bb_utils': ['data/hatchdates2016.csv',
+                               'data/foragergroups2016.csv']},
     entry_points={
         'console_scripts': [
             'bb_gt_to_hdf5 = bb_utils.scripts.gt_to_hdf5:run',
