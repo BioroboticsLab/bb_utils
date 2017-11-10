@@ -16,6 +16,9 @@ class BeeMetaInfo:
         self.foragers.date = pd.to_datetime(self.foragers.date, format='%d.%m.%Y')
         self.foragers.dec12 = self.foragers.dec12.apply(lambda ids: list(map(int, ids.split(' '))))
 
+        beenames_path = pkg_resources.resource_filename('bb_utils', 'data/beenames.csv')
+        self.beenames = pd.read_csv(beenames_path, sep=' ')
+
     def _check_date(self, timestamp):
         if timestamp.year != 2016:
             raise ValueError('Meta information only available for season 2016')
@@ -94,3 +97,13 @@ class BeeMetaInfo:
 
         bee_hatchdate = self.get_hatchdate(bee_id)
         return timestamp - bee_hatchdate
+
+    def get_beename(self, bee_id):
+        """Return the Beename-Char-RNN generated name for the given ID.
+
+        Arguments:
+            bee_id (:class:`.BeesbookID`): :class:`.BeesbookID` with ID
+        Returns:
+            :class:`str` Name of the bee with the given ID
+        """
+        return self.beenames[self.beenames.bee_id == bee_id.as_ferwar()].name.values[0]
