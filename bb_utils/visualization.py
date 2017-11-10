@@ -1,5 +1,4 @@
 import numpy as np
-import cairocffi as cairo
 from io import BytesIO
 from more_itertools import pairwise
 
@@ -20,6 +19,8 @@ class TagArtist:
         self.guideline_width = guideline_width
 
     def draw(self, bits_12):
+        import cairocffi as cairo
+        
         bits = np.roll(bits_12, -3)
 
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
