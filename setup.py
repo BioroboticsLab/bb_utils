@@ -27,7 +27,8 @@ setup(
     package_dir={'bb_utils': 'bb_utils/'},
     package_data={'bb_utils': ['data/hatchdates2016.csv',
                                'data/foragergroups2016.csv',
-                               'data/beenames.csv']},
+                               'data/beenames.csv',
+                               'data/fiducial_marker.npz']},
     entry_points={
         'console_scripts': [
             'bb_gt_to_hdf5 = bb_utils.scripts.gt_to_hdf5:run',
