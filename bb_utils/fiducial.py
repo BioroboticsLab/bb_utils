@@ -171,10 +171,28 @@ def locate_markers(image, markersize, n_markers, marker=None, rescale="auto"):
     extrema = [(convs[y, x] / (rotation_steps * steps), x, y) for (y, x) in extrema]
     extrema = sorted(extrema, reverse=True)
     
+    def get_image_crop_coordinates(im, x, y, half_width):
+        """Helper function to crop a quadratic region around a center point out of an image
+        while respecting the image size."""
+        x1, x2 = max(0, x - half_width), min(x + half_width, im.shape[1])
+        y1, y2 = max(0, y - half_width), min(y + half_width, im.shape[0])
+        return (x1, y1, x2, y2)
+
     results = []
     for (score, x, y) in extrema[:n_markers]:
-        sub_image = image[(y-2):(y+2), (x-2):(x+2)]
-        marker_type = sub_image.sum() > 0.0
+        # Crop the whole marker image out.
+        # Leave the outer frame out so that we ideally only have the one dark or bright ring.
+        x1, y1, x2, y2 = get_image_crop_coordinates(image, x, y, int((4 * markersize / 5) // 2 - 1))
+        whole_marker = image[y1:y2, x1:x2]
+        # Crop the inner section of the marker out.
+        ix1, iy1, ix2, iy2 = get_image_crop_coordinates(image, x, y, max(markersize // 8, 2))
+        inner_section = image[iy1:iy2, ix1:ix2]
+        # Mask the inner section in the whole-marker-crop.
+        inner_section_mask = np.zeros(shape=whole_marker.shape, dtype=bool)
+        inner_section_mask[(iy1-y1):(iy2-y2), (ix1-x1):(ix2-x2)] = True
+        whole_marker = np.ma.MaskedArray(data=whole_marker, mask=inner_section_mask)
+        # The type of the marker is defined by the brightness difference of the inner section and the rest.
+        marker_type = np.nanmedian(inner_section) > np.ma.median(whole_marker)
         results.append((x / rescale, y / rescale, marker_type, score))
     return results
 
