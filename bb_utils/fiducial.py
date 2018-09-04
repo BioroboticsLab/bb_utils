@@ -94,7 +94,7 @@ def get_marker(load=True, **kwargs):
 
     return marker
 
-def locate_markers(image, markersize, n_markers, marker=None, rescale="auto"):
+def locate_markers(image, markersize, n_markers, marker=None, rescale="auto", pad_borders=True):
     """Attempts to locate markers in an image. The markersize in pixels must be approximately known.
         Returns the first n_markers with the highest score.
         The image can be rescaled automatically to make the convolution faster.
@@ -105,6 +105,7 @@ def locate_markers(image, markersize, n_markers, marker=None, rescale="auto"):
             n_markers: Amount of markers to return.
             marker: (optional) numpy array; marker template. Will be loaded with get_marker() if not given.
             rescale: scaling factor for the image. "auto" means that the image will be scaled so that the markers are still sufficiently larger.
+            pad_borders: Whether to pad the image borders to be able to recognize cut-off markers.
 
         Returns:
             list of (x, y, marker_type, score): x, y are pixel coordinates in the original image.
@@ -140,6 +141,11 @@ def locate_markers(image, markersize, n_markers, marker=None, rescale="auto"):
         image = skimage.transform.rescale(image, rescale)
         markersize = int(markersize * rescale)
     
+    padding_width = 0
+    if pad_borders:
+        padding_width = markersize // 2
+        image = np.pad(image, padding_width, "edge")
+
     image = skimage.exposure.equalize_adapthist(image, kernel_size=markersize)
     image = image - image.min()
     image /= image.max()
@@ -193,7 +199,7 @@ def locate_markers(image, markersize, n_markers, marker=None, rescale="auto"):
         whole_marker = np.ma.MaskedArray(data=whole_marker, mask=inner_section_mask)
         # The type of the marker is defined by the brightness difference of the inner section and the rest.
         marker_type = np.nanmedian(inner_section) > np.ma.median(whole_marker)
-        results.append((x / rescale, y / rescale, marker_type, score))
+        results.append(((x - padding_width) / rescale, (y - padding_width) / rescale, marker_type, score))
     return results
 
 def locate_markers_in_corners(image, markersize, marker=None, corner_ratio=0.25, **kwargs):
