@@ -4,6 +4,11 @@
 
 This repository holds beesbook utilities.
 
+Installation
+================
+pip install git+https://github.com/BioroboticsLab/bb_utils.git
+
+
 Fiducial markers
 ================
 The submodule `bb_utils.fiducial` holds helper functions to generate simple fiducial markers carrying one bit of information
