@@ -244,7 +244,7 @@ def arg_clockwise_order(pts):
             np.argmax(s),
             np.argmax(diff)]
 
-def match_homography_points(points, scale=10.0, year=2018):
+def match_homography_points(points, scale=10.0, year=2019):
     """Takes recognized markers, treats them as corner points of a homography and returns a matching homography matrix.
         The four points must contain either exactly three points with type=False or type=True. This is necessary for sorting them correctly.
 
@@ -265,15 +265,19 @@ def match_homography_points(points, scale=10.0, year=2018):
         # The third point was of the inverse marker type compared to the other three.
         homography_points = [((0, 0), (40.4, -0.1), (40.6, 27.9), (-0.1, 27.9)),
                         ((0, 0),  (40.2, 0), (40.6, 28.1), (0.4, 28.1))] 
+    elif year == 2019:
+        # Same as above.
+        homography_points = [((0, 0), (40.4, 0), (40.6, 27.9), (0.2, 27.9)),
+                             ((0, 0),  (40.4, 0), (40.6, 28.0), (0.0, 28.1))]
     else:
-        raise ValueError("Homography data only available for 2018.")
+        raise ValueError("Homography data only available for 2018/2019.")
     # Extract XY coordinates from the points (image pixel coordinates).
     xy = np.array([(p[0], p[1]) for p in points])
     # Extract the marker types from the points (either three True and one False or vice-versa).
     types = np.array([p[2] for p in points])
     # The amount of white markers detemines the side (either 1 or 3).
-    image_side = 0 if np.sum(types) > 2 else 1
-    high_id = [False, True][image_side] # "Special" marker
+    image_side = 1 if np.sum(types) > 2 else 0
+    high_id = [True, False][image_side] # "Special" marker
     # Order the points in clockwise order.
     order = arg_clockwise_order(xy)
     resorted_types = types[order]
