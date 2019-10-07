@@ -75,6 +75,16 @@ class BeesbookID:
         return cls(cls._dec_to_bin(bee_id))
 
     @classmethod
+    def from_dec_12_reverse(cls, bee_id):
+        """Initialize ID using decimal representation used in the tracking ground truth by Jakob Mischek.
+
+        Arguments:
+            bee_id: ID in dec_12_reverse representation
+        """
+
+        return cls(cls._dec_to_bin(bee_id)[::-1])
+
+    @classmethod
     def from_ferwar(cls, bee_id):
         """Initialize ID using decimal representation originally used by Fernando Wario.
 
