@@ -36,7 +36,7 @@ class BeeMetaInfo:
         indices = np.where(self.hatchdates.dec12 == bee_id.as_dec_12())[0]
         if len(indices) == 0:
             raise ValueError('Unknown ID {}'.format(bee_id))
-        return self.hatchdates.iloc[indices[0]].hatchdate
+        return pd.to_datetime(self.hatchdates.iloc[indices[0]].hatchdate)
 
     def get_group_memberships(self, bee_id):
         """Get forager groups of the bee with the given ID.
