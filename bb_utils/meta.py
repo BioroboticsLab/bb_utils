@@ -19,9 +19,13 @@ class BeeMetaInfo:
         beenames_path = pkg_resources.resource_filename('bb_utils', 'data/beenames.csv')
         self.beenames = pd.read_csv(beenames_path, sep=' ')
 
-    def _check_date(self, timestamp):
-        if timestamp.year != 2016:
-            raise ValueError('Meta information only available for season 2016')
+        idmapping_path = pkg_resources.resource_filename('bb_utils', 'data/idmapping2019.csv')
+        self.idmapping = pd.read_csv(idmapping_path, parse_dates=['date'])
+        self.idmapping.date = self.idmapping.date.dt.tz_localize('UTC')
+
+    def _check_date(self, timestamp, check_year=2016):
+        if timestamp.year != check_year:
+            raise ValueError('Meta information only available for season {}'.format(check_year))
 
     def get_hatchdate(self, bee_id):
         """Get hatchdate of the bee with the given ID.
@@ -107,3 +111,20 @@ class BeeMetaInfo:
             :class:`str` Name of the bee with the given ID
         """
         return self.beenames[self.beenames.bee_id == bee_id.as_ferwar()].name.values[0]
+
+    def get_mapped_id(self, bee_id, timestamp):
+        """
+        Return the mapped id given the timestamp such that each reused has a unique ID.
+
+        Arguments:
+            bee_id (:class:`.BeesbookID`): :class:`.BeesbookID` with ID
+            timestamp (:class:`datetime.datetime`): :class:`datatime.datetime` with timestamp
+
+        Returns:
+            :class:`int` Original ID in ferwar format for IDs that don't need mapping, mapped ID otherwise
+        """
+        self._check_date(timestamp, check_year=2019)
+
+        mapped = self.idmapping[self.idmapping.bee_id == bee_id.as_ferwar()]
+        mapped = mapped[mapped.date <= timestamp]
+        return mapped.iloc[-1].mapped_id
