@@ -7,7 +7,7 @@ class BeesbookID:
     def __init__(self, bee_id):
         if type(bee_id) is not np.array:
             bee_id = np.array(bee_id)
-        bee_id = np.round(bee_id).astype(np.int)
+        bee_id = np.round(bee_id).astype(int)
 
         self.binary_12 = bee_id
 
@@ -15,7 +15,7 @@ class BeesbookID:
     def _dec_to_bin(bee_id):
         assert(bee_id < 4096)
         bee_id = (np.array([2 ** i for i in range(11, -1, -1)]) & bee_id)
-        return bee_id.astype(np.bool).astype(np.int)
+        return bee_id.astype(np.bool).astype(int)
 
     @classmethod
     def from_bin_9(cls, bee_id):
@@ -211,7 +211,7 @@ class BeesbookID:
         Returns:
             :obj:`np.array`: array of decimal IDs in ferwar representation
         """
-        binary_ids = np.round(ids).astype(np.int)
+        binary_ids = np.round(ids).astype(int)
 
         adjusted_ids = np.roll(binary_ids, 3, axis=1)
 
