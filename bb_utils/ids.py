@@ -15,7 +15,7 @@ class BeesbookID:
     def _dec_to_bin(bee_id):
         assert(bee_id < 4096)
         bee_id = (np.array([2 ** i for i in range(11, -1, -1)]) & bee_id)
-        return bee_id.astype(np.bool).astype(int)
+        return bee_id.astype(bool).astype(int)
 
     @classmethod
     def from_bin_9(cls, bee_id):
