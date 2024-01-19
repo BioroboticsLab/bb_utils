@@ -132,7 +132,7 @@ def run(gt_file, videos, images, visualize_debug, output, fix_utc_2014, nb_bits=
             for name in np_frame.dtype.names:
                 gt[name] = np_frame[name][mask]
             bits = [int_id_to_binary(id)[::-1] for id in gt["decodedId"]]
-            gt["bits"] = 2*np.array(bits, dtype=np.float) - 1
+            gt["bits"] = 2*np.array(bits, dtype=float) - 1
             gt["tags"] = 2 * (rois / 255.).astype(np.float16) - 1
             gt['filename'] = os.path.basename(video_filename)
             gt['camIdx'] = camIdx
