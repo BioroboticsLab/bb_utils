@@ -40,7 +40,6 @@ def plot_sheet(w=4, h=4, figsize=(32, 32)):
 
     for i, ax in enumerate(axes):
         plot_marker(ax, inverse=(i % 2 == 0))
-    plt.show()
 
 def generate_marker(inverse=False, save_to=None, resize=None):
     """Draws a marker using pyplot and then returns it as a numpy array.
