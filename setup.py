@@ -3,7 +3,7 @@
 try:
     from setuptools import setup
 except ImportError:
-    from distutils.core import setup
+    from setuptools import setup
     
 def parse_requirements(filename):
     """ load requirements from a pip requirements file """
